@@ -191,6 +191,16 @@ public class Autoloader {
 
         if (lower.endsWith(".jar")) {
             JarExecutor.execute(file);
+        } else if (file.getName().equalsIgnoreCase("elfldr.elf")) {
+            if (!isPortOpen(9021)) {
+                Status.println("Loading custom elfldr.elf: " + file.getAbsolutePath());
+                byte[] elfData = readFileNative(file.getAbsolutePath());
+                ElfLoader.loadElf(elfData);
+                Status.println("Waiting for custom elfldr to start...");
+                Thread.sleep(4000);
+            } else {
+                Status.println("ELF loader already active, skipping custom elfldr.elf");
+            }
         } else if (lower.endsWith(".elf") || lower.endsWith(".bin")) {
             executeElf(file);
         } else {

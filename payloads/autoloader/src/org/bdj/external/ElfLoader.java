@@ -401,12 +401,20 @@ public class ElfLoader {
             buf.close();
             Status.println("Embedded ELF size: " + String.valueOf(elfData.length) +
                         " bytes (0x" + Integer.toHexString(elfData.length) + ")");
-            ensureAddresses();
-            elfLoader(elfData);
+            loadElf(elfData);
         } catch (Exception e) {
             Status.printStackTrace("Failed to load embedded ELF: ", e);
         } finally {
             try { elfStream.close(); } catch (IOException ignored) {}
+        }
+    }
+
+    public static void loadElf(byte[] elfData) {
+        try {
+            ensureAddresses();
+            elfLoader(elfData);
+        } catch (Exception e) {
+            Status.printStackTrace("Failed to load ELF: ", e);
         }
     }
 
