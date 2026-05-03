@@ -491,17 +491,22 @@ public class GPU {
         }
         
         Status.info("[GPU] Patching kernel data...");
+        // this gives time to render the log line before heavy work causes a short freeze
+        try { Thread.sleep(50); } catch (Exception e) {}
         
         long securityFlagsAddr = kdata_base + SECURITY_FLAGS;
         int securityFlags = kapi.kread32(securityFlagsAddr);
         gwrite32(securityFlagsAddr, securityFlags | 0x14);
+        Status.info("[GPU] Security flags patched");
         
         long targetIdFlagsAddr = securityFlagsAddr + 0x09;
         gwrite8(targetIdFlagsAddr, (byte) 0x82);
+        Status.info("[GPU] Target ID flags patched");
         
         long qaFlagsAddr = securityFlagsAddr + 0x24;
         int qaFlags = kapi.kread32(qaFlagsAddr);
         gwrite32(qaFlagsAddr, qaFlags | 0x10300);
+        Status.info("[GPU] QA flags patched");
         
         long utokenFlagsAddr = securityFlagsAddr + 0x8C;
         byte utokenFlags = kapi.kread8(utokenFlagsAddr);

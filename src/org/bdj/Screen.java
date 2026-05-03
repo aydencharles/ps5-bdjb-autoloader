@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
@@ -69,6 +70,9 @@ public class Screen extends Container {
     private volatile boolean isPainting = false;
     private volatile boolean isDirty = false;
     private volatile boolean isVisible = true;
+
+    private Image offscreenImage = null;
+    private Graphics offscreenGraphics = null;
 
     /**
      * Default constructor. Declared as private since this class is singleton.
@@ -191,19 +195,16 @@ public class Screen extends Container {
 
     private void safeRepaint() {
         if (EventQueue.isDispatchThread()) {
-            // Already on EDT, repaint directly
-            if (isDisplayable()) {
+            repaint();
+        } else {
+            // Aggressive immediate paint to bypass starvation
+            java.awt.Graphics g = getGraphics();
+            if (g != null) {
+                paint(g);
+                g.dispose();
+            } else {
                 repaint();
             }
-        } else {
-            // Not on EDT, queue the repaint
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    if (isDisplayable()) {
-                        repaint();
-                    }
-                }
-            });
         }
     }
 
@@ -308,16 +309,27 @@ public class Screen extends Container {
         try {
             int width = getWidth();
             int height = getHeight();
+            if (width <= 0 || height <= 0) return;
+
+            // Double Buffering Setup
+            if (offscreenImage == null || offscreenImage.getWidth(null) != width || offscreenImage.getHeight(null) != height) {
+                offscreenImage = createImage(width, height);
+                if (offscreenImage != null) {
+                    offscreenGraphics = offscreenImage.getGraphics();
+                }
+            }
+
+            Graphics targetG = (offscreenGraphics != null) ? offscreenGraphics : g;
 
             // 1. Draw Background
-            g.setColor(getBackground());
-            g.fillRect(0, 0, width, height);
+            targetG.setColor(getBackground());
+            targetG.fillRect(0, 0, width, height);
 
             // 2. Draw Title
-            g.setFont(TITLE_FONT);
-            g.setColor(Color.white);
-            int titleWidth = g.getFontMetrics().stringWidth(currentTitle);
-            g.drawString(currentTitle, (width - titleWidth) / 2, 80);
+            targetG.setFont(TITLE_FONT);
+            targetG.setColor(Color.white);
+            int titleWidth = targetG.getFontMetrics().stringWidth(currentTitle);
+            targetG.drawString(currentTitle, (width - titleWidth) / 2, 80);
 
             // 3. Draw Log Container
             int logWidth = (int) (width * 0.7);
@@ -326,23 +338,23 @@ public class Screen extends Container {
             int logY = 150;
 
             // Container Background
-            g.setColor(Color.black);
-            g.fillRect(logX, logY, logWidth, logHeight);
+            targetG.setColor(Color.black);
+            targetG.fillRect(logX, logY, logWidth, logHeight);
 
             // Container Border (Blue Accent)
-            g.setColor(new Color(0x0036AA));
-            g.drawRect(logX - 1, logY - 1, logWidth + 1, logHeight + 1);
-            g.drawRect(logX - 2, logY - 2, logWidth + 3, logHeight + 3);
+            targetG.setColor(new Color(0x0036AA));
+            targetG.drawRect(logX - 1, logY - 1, logWidth + 1, logHeight + 1);
+            targetG.drawRect(logX - 2, logY - 2, logWidth + 3, logHeight + 3);
 
             // Render Messages
-            g.setFont(FONT);
-            int fontHeight = g.getFontMetrics().getHeight();
+            targetG.setFont(FONT);
+            int fontHeight = targetG.getFontMetrics().getHeight();
             int msgX = logX + 15;
             int msgY = logY + 40;
             for (int i = 0; i < messagesCopy.size(); i++) {
                 Message msg = (Message) messagesCopy.get(i);
-                g.setColor(msg.type.getColor());
-                g.drawString("> " + msg.text, msgX, msgY);
+                targetG.setColor(msg.type.getColor());
+                targetG.drawString("> " + msg.text, msgX, msgY);
                 msgY += fontHeight + 8;
             }
 
@@ -352,7 +364,12 @@ public class Screen extends Container {
             int pbX = (width - pbWidth) / 2;
             int pbY = logY + logHeight + 30;
 
-            drawProgressBar(g, pbX, pbY, pbWidth, pbHeight, pct, pctMsg);
+            drawProgressBar(targetG, pbX, pbY, pbWidth, pbHeight, pct, pctMsg);
+
+            // If we used the off-screen buffer, copy it to the real graphics object
+            if (offscreenGraphics != null) {
+                g.drawImage(offscreenImage, 0, 0, null);
+            }
         } finally {
             synchronized (this) {
                 isPainting = false;
