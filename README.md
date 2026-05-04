@@ -4,7 +4,7 @@
 <h1 align="center">PS5 BD-JB Autoloader</h1>
 <h3 align="center">Fork of <a href="https://github.com/Gezine/BD-UN-JB">BD-UN-JB</a></h3>
 &nbsp;
-<p align="center">Automatically loads your .elf, .bin and .jar payloads.<br>Supports PS5 firmwares up to 7.61. <br><b>Note:</b> If you are already jailbroken on a higher firmware (up to 12.00), you can make it work by using the `bdj_unpatch` payload.</p>
+<p align="center">Automatically loads your .elf, .bin and .jar payloads.<br>Supports PS5 firmwares up to 7.61. <br><b>Note:</b> If you are already jailbroken on a higher firmware (up to 12.00), you can make it work by using the <a href="https://github.com/Gezine/BD-UN-JB/releases">bdj_unpatch</a> payload.</p>
 
 <p align="center">
     <b>Other Autoloaders:</b><br>
@@ -64,6 +64,7 @@ The autoloader includes **Payload Manager**. Using it is the most reliable way t
 
 ## Credits
 
+* **[Gezine](https://github.com/Gezine)** - [BD-UN-JB](https://github.com/Gezine/BD-UN-JB), [Poops exploit implementation](https://github.com/Gezine/BD-UN-JB/blob/main/payloads/poops/src/org/bdj/external/Poops.java)
 * **[TheFlow](https://github.com/theofficialflow)** — BD-JB documentation & native code execution sources.  
 * **[hammer-83](https://github.com/hammer-83)** — PS5 Remote JAR Loader reference.  
 * **[john-tornblom](https://github.com/john-tornblom)** — [BDJ-SDK](https://github.com/john-tornblom/bdj-sdk) and [ps5-payload-sdk](https://github.com/ps5-payload-dev/sdk/) used for compilation.  
