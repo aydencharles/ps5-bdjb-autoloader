@@ -18,6 +18,12 @@
 DISC_LABEL := ps5-bd-jb-autoloader
 VERSION    := 1.0
 
+# Git info for versioning
+GIT_HASH   := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+GIT_DIRTY  := $(shell git status --porcelain 2>/dev/null)
+ISO_VERSION := v$(VERSION)-$(if $(GIT_DIRTY),DEV-$(shell date +"%Y%m%d%H%M%S"),$(GIT_HASH))
+ISO_FILE   := $(DISC_LABEL)-$(ISO_VERSION).iso
+
 #
 # Host tools
 #
@@ -51,7 +57,7 @@ DISC_FILES := $(patsubst $(BDJSDK_HOME)/resources/AVCHD%,discdir%,$(TMPL_FILES))
               discdir/BDMV/JAR/00000.jar
 
 
-all: $(DISC_LABEL).iso
+all: $(ISO_FILE)
 
 autoloader: discdir/BDMV/JAR/00000.jar
 	$(MAKE) -C payloads/autoloader all
@@ -60,9 +66,15 @@ poops: discdir/BDMV/JAR/00000.jar
 	$(MAKE) -C payloads/poops all
 
 src/org/bdj/Version.java:
-	echo "package org.bdj;" > $@
-	echo "public class Version {" >> $@
-	echo "    public static final String VERSION = \"$(VERSION)\";" >> $@
+	@GIT_HASH=$$(git rev-parse --short HEAD 2>/dev/null || echo "unknown"); \
+	GIT_DIRTY=$$(git status --porcelain 2>/dev/null); \
+	if [ -n "$$GIT_DIRTY" ]; then HASH="DEV"; else HASH="$$GIT_HASH"; fi; \
+	BUILD_TIME=$$(date -u +"%Y-%m-%d %H:%M:%S UTC"); \
+	echo "package org.bdj;" > $@; \
+	echo "public class Version {" >> $@; \
+	echo "    public static final String VERSION = \"$(VERSION)\";" >> $@; \
+	echo "    public static final String HASH = \"$$HASH\";" >> $@; \
+	echo "    public static final String BUILD_TIME = \"$$BUILD_TIME\";" >> $@; \
 	echo "}" >> $@
 
 discdir:
@@ -76,7 +88,7 @@ discdir/%: discdir
 	cp $(BDJSDK_HOME)/resources/AVCHD/$* $@
 
 
-$(DISC_LABEL).iso: $(DISC_FILES) autoloader poops
+$(ISO_FILE): $(DISC_FILES) autoloader poops
 	cp payloads/autoloader/autoloader.jar discdir/autoloader.jar
 	cp payloads/poops/poops.jar discdir/poops.jar
 	cp -r BDMV/META discdir/BDMV/
@@ -86,5 +98,5 @@ $(DISC_LABEL).iso: $(DISC_FILES) autoloader poops
 	$(MAKEFS) -m 16m -t udf -o T=bdre,v=2.50,L=$(DISC_LABEL) $@ discdir
 
 clean:
-	rm -rf META-INF $(DISC_LABEL).iso discdir src/jdk/internal/misc/*.class src/org/bdj/*.class src/org/bdj/sandbox/*.class src/org/bdj/api/*.class src/org/bdj/Version.java
+	rm -rf META-INF *.iso discdir src/jdk/internal/misc/*.class src/org/bdj/*.class src/org/bdj/sandbox/*.class src/org/bdj/api/*.class src/org/bdj/Version.java
     

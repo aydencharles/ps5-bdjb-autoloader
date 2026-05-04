@@ -48,7 +48,6 @@ public class Status {
         }
         if (WINDOWBOOL) {
             ProgressUI.getInstance().log(finalMsg);
-            breather();
         }
     }
 
@@ -60,7 +59,6 @@ public class Status {
         }
         if (WINDOWBOOL) {
             ProgressUI.getInstance().logSuccess(finalMsg);
-            breather();
         }
     }
 
@@ -72,7 +70,6 @@ public class Status {
         }
         if (WINDOWBOOL) {
             ProgressUI.getInstance().logWarning(finalMsg);
-            breather();
         }
     }
 
@@ -85,7 +82,6 @@ public class Status {
         if (WINDOWBOOL) {
             ProgressUI.getInstance().logError(finalMsg);
             ProgressUI.getInstance().setProgress(lastPercent, "ERROR");
-            breather();
         }
     }
 
@@ -93,7 +89,6 @@ public class Status {
         lastPercent = percent;
         if (WINDOWBOOL) {
             ProgressUI.getInstance().setProgress(percent, label);
-            breather();
         }
     }
 
@@ -107,16 +102,8 @@ public class Status {
             ProgressUI.getInstance().logError(finalMsg);
             ProgressUI.getInstance().setProgress(lastPercent, "ERROR");
             Screen.getInstance().printStackTrace(e);
-            breather();
         }
     }
 
-    private static void breather() {
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
 }

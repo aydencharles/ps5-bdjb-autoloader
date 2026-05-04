@@ -59,6 +59,7 @@ public class Screen extends Container {
     private final Font FONT = new Font("SansSerif", Font.BOLD, 28);
     private final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 48);
     private final Font PROGRESS_FONT = new Font("SansSerif", Font.BOLD, 28);
+    private final Font VERSION_FONT = new Font("SansSerif", Font.PLAIN, 18);
 
     private final ArrayList messages = new ArrayList();
     private int progressPercent = 0;
@@ -193,15 +194,24 @@ public class Screen extends Container {
         safeRepaint();
     }
 
+    private long lastPaintTime = 0;
+    private static final long PAINT_INTERVAL = 100; // ms
+
     private void safeRepaint() {
         if (EventQueue.isDispatchThread()) {
             repaint();
         } else {
-            // Aggressive immediate paint to bypass starvation
-            java.awt.Graphics g = getGraphics();
-            if (g != null) {
-                paint(g);
-                g.dispose();
+            long now = System.currentTimeMillis();
+            if (now - lastPaintTime >= PAINT_INTERVAL) {
+                lastPaintTime = now;
+                // Aggressive immediate paint to bypass starvation
+                java.awt.Graphics g = getGraphics();
+                if (g != null) {
+                    paint(g);
+                    g.dispose();
+                } else {
+                    repaint();
+                }
             } else {
                 repaint();
             }
@@ -316,6 +326,8 @@ public class Screen extends Container {
                 offscreenImage = createImage(width, height);
                 if (offscreenImage != null) {
                     offscreenGraphics = offscreenImage.getGraphics();
+                } else {
+                    offscreenGraphics = null;
                 }
             }
 
@@ -365,6 +377,12 @@ public class Screen extends Container {
             int pbY = logY + logHeight + 30;
 
             drawProgressBar(targetG, pbX, pbY, pbWidth, pbHeight, pct, pctMsg);
+            
+            // 5. Draw Footer (Version Info)
+            targetG.setFont(VERSION_FONT);
+            targetG.setColor(new Color(0x666666));
+            String versionStr = "PS5 BD-JB Autoloader v" + Version.VERSION + " by PLK (" + Version.HASH + ", built at " + Version.BUILD_TIME + ")";
+            targetG.drawString(versionStr, 12, height - 12);
 
             // If we used the off-screen buffer, copy it to the real graphics object
             if (offscreenGraphics != null) {
