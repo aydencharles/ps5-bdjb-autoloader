@@ -4,7 +4,7 @@
 <h1 align="center">PS5 BD-JB Autoloader</h1>
 <h3 align="center">Fork of <a href="https://github.com/Gezine/BD-UN-JB">BD-UN-JB</a></h3>
 &nbsp;
-<p align="center">Automatically loads your .elf, .bin and .jar payloads.<br>Supports PS5 firmwares up to 7.61. <br><b>Note:</b> If you are already jailbroken on a higher firmware (up to 12.00), you can make it work by using the <a href="https://github.com/Gezine/BD-UN-JB/releases">bdj_unpatch</a> payload.</p>
+<p align="center">Automatically loads your .elf, .bin and .jar payloads.<br>Supports PS5 firmwares 6.00-12.00. <br><b>Note:</b> To work on firmwares <b>above 7.61</b>, the PS5 must already be jailbroken (requires the <a href="https://github.com/Gezine/BD-UN-JB/releases">bdj_unpatch</a> payload).</p>
 
 <p align="center">
     <b>Other Autoloaders:</b><br>
@@ -53,12 +53,6 @@ By default, the autoloader uses a bundled version of **elfldr** that only accept
 If you want to use a "normal" ELF Loader that allows sending payloads from any device:
 1. Place your `elfldr.elf` in the `ps5_autoloader` directory.
 2. Add `elfldr.elf` as the first entry in your `autoload.txt`.
-</Details>
-
-<Details>
-<Summary><i>Payload Manager integration</i></Summary>
-
-The autoloader includes **Payload Manager**. Using it is the most reliable way to load etaHEN/kstuff, as it closes the Disc app before sending the payloads. To use it, make `pldmgr.elf` the **only** item in your `autoload.txt`.
 </Details>
 
 <Details>
