@@ -197,17 +197,6 @@ public class Autoloader {
         if (lower.endsWith(".jar")) {
             Status.info("Executing JAR: " + file.getName());
             JarExecutor.execute(file);
-        } else if (file.getName().equalsIgnoreCase("elfldr.elf")) {
-            if (!isPortOpen(9021)) {
-                Status.info("Loading custom elfldr: " + file.getName());
-                byte[] elfData = readFileNative(file.getAbsolutePath());
-                ElfLoader.loadElf(elfData);
-                Status.info("Waiting for custom elfldr to start...");
-                Status.setProgress(91, "Starting Custom ELF Loader...");
-                Thread.sleep(4000);
-            } else {
-                Status.info("ELF loader already active, skipping custom elfldr");
-            }
         } else if (lower.endsWith(".elf") || lower.endsWith(".bin")) {
             Status.info("Loading " + file.getName() + "...");
             executeElf(file);
@@ -229,14 +218,7 @@ public class Autoloader {
 
     private static void executeElf(File elfFile) throws Exception {
         if (!isPortOpen(9021)) {
-            Status.info("ELF loader not ready on port 9021, loading embedded elfldr...");
-            ElfLoader.loadEmbeddedElf();
-            Status.info("Waiting for elfldr to start...");
-            Status.setProgress(91, "Starting ELF Loader...");
-            Thread.sleep(4000);
-            if (!isPortOpen(9021)) {
-                Status.warning("Warning: port 9021 still not open after 4s. Attempting to send anyway...");
-            }
+            Status.warning("Warning: port 9021 is not open. ELF loader might not be running. Attempting to send anyway...");
         }
 
         // Read ELF data
