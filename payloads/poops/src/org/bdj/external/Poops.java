@@ -1385,12 +1385,12 @@ public class Poops {
         
         if (kapi.getKdataBase() != 0) {
             Status.success("Already jailbroken");
-            return;
+            throw new RuntimeException("ABORT");
         }
         
         if (!setup()) {
             Status.println("setup failed");
-            return;
+            throw new RuntimeException("ABORT");
         }
         
         Status.info("Triggering exploit...");
@@ -1398,7 +1398,7 @@ public class Poops {
             Status.error("triggerUcredTripleFree failed");
             cleanup();
             Status.error("Exploit failed - Reboot and try again");
-            return;
+            throw new RuntimeException("ABORT");
         }
 
         rtprioNormal();
@@ -1410,7 +1410,7 @@ public class Poops {
             Status.error("leakKqueue failed");
             cleanup();
             Status.error("Exploit failed - Reboot and try again");
-            return;
+            throw new RuntimeException("ABORT");
         }
         // Status.println("leakKqueue finished");
         
@@ -1469,7 +1469,7 @@ public class Poops {
                 cleanup();
                 Status.println("Exploit failed - Reboot and try again");
                 NativeInvoke.sendNotificationRequest("Exploit failed - Reboot and try again");
-                return;
+                throw new RuntimeException("ABORT");
             }
             
             cleanup();
@@ -1482,7 +1482,7 @@ public class Poops {
                 Status.error("PS5 jailbreak failed");
                 cleanup();
                 Status.error("Exploit failed - Reboot and try again");
-                return;
+                throw new RuntimeException("ABORT");
             }
             
             cleanup();

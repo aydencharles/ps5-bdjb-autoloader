@@ -35,7 +35,11 @@ public class InternalJarLoader implements Runnable {
         } catch (IOException e) {
             Status.printStackTrace("JarLoader error", e);
         } catch (Exception e) {
-            Status.printStackTrace("JarLoader error", e);
+            if (e.getCause() != null && "ABORT".equals(e.getCause().getMessage())) {
+                // poops.jar aborted intentionally (e.g. already jailbroken), silently skip autoloader
+            } else {
+                Status.printStackTrace("JarLoader error", e);
+            }
         }
     }
 
