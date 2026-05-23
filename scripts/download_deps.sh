@@ -63,9 +63,31 @@ curl -L -o "$DEST_DIR/$KEXP_FILE" "$KEXP_URL"
 echo "Downloading $PLDMGR_FILE..."
 curl -L -o "$AUTOLOADER_DIR/$PLDMGR_FILE" "$PLDMGR_URL"
 
-echo "Updating autoload.txt with $PLDMGR_FILE..."
-sed -E "s/pldmgr[_v|-]+[0-9.]+\.elf/$PLDMGR_FILE/" "$AUTOLOADER_DIR/autoload.txt" > "$AUTOLOADER_DIR/autoload.txt.tmp"
-mv "$AUTOLOADER_DIR/autoload.txt.tmp" "$AUTOLOADER_DIR/autoload.txt"
+echo "Generating autoload.txt with $PLDMGR_FILE..."
+cat << EOF > "$AUTOLOADER_DIR/autoload.txt"
+#
+# ps5_autoloader
+# autoload config file
+# -----------------------------------------------------------------------------------------
+# The loader looks for ps5_autoloader/autoload.txt in this order (highest priority first):
+# 1) USB drives
+# 2) /data directory
+# 3) BD Disc
+# Only the first autoload.txt found will be used.
+#
+# Usage:
+# - Put one filename per line (e.g., payload.elf).
+# - Supported payload types: .elf, .bin, .jar
+# - Lines starting with '!' are sleep commands (example: !1000 sleeps for 1000 ms).
+#
+# Notes:
+# - The kernel exploit will start automatically - do NOT include it here!
+# - You can use custom elf loader by putting it here and adding
+#   elfldr.elf (must be that filename!) line before other ELFs.
+# -----------------------------------------------------------------------------------------
+
+$PLDMGR_FILE
+EOF
 
 echo "Successfully downloaded all dependencies!"
 ls -la "$DEST_DIR"

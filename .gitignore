@@ -10,6 +10,4 @@ src/org/bdj/Version.java
 payloads/poops/src/org/bdj/external/kexp-*.bin
 payloads/poops/src/org/bdj/external/elfldr-*.elf
 payloads/poops/src/org/bdj/external/BinaryPaths.java
-ps5_autoloader/pldmgr-*.elf
-ps5_autoloader/pldmgr_v*.elf
-
+ps5_autoloader/

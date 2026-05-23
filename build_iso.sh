@@ -20,6 +20,37 @@ done
 
 DEST_DIR="payloads/poops/src/org/bdj/external"
 
+# Helper to generate autoload.txt
+generate_autoload_txt() {
+    local pldmgr_name="$1"
+    mkdir -p ps5_autoloader
+    cat << EOF > ps5_autoloader/autoload.txt
+#
+# ps5_autoloader
+# autoload config file
+# -----------------------------------------------------------------------------------------
+# The loader looks for ps5_autoloader/autoload.txt in this order (highest priority first):
+# 1) USB drives
+# 2) /data directory
+# 3) BD Disc
+# Only the first autoload.txt found will be used.
+#
+# Usage:
+# - Put one filename per line (e.g., payload.elf).
+# - Supported payload types: .elf, .bin, .jar
+# - Lines starting with '!' are sleep commands (example: !1000 sleeps for 1000 ms).
+#
+# Notes:
+# - The kernel exploit will start automatically - do NOT include it here!
+# - You can use custom elf loader by putting it here and adding
+#   elfldr.elf (must be that filename!) line before other ELFs.
+# -----------------------------------------------------------------------------------------
+
+$pldmgr_name
+EOF
+    echo "Generated ps5_autoloader/autoload.txt pointing to $pldmgr_name"
+}
+
 # Helper to build dependencies from source
 build_source_deps() {
     echo "=== Building dependencies from source ==="
@@ -56,8 +87,7 @@ build_source_deps() {
     fi
     PLDMGR_NAME=$(basename "$PLDMGR_ELF")
     cp "$PLDMGR_ELF" "ps5_autoloader/$PLDMGR_NAME"
-    sed -E "s/pldmgr[_v|-]+[0-9.]+\.elf/$PLDMGR_NAME/" ps5_autoloader/autoload.txt > ps5_autoloader/autoload.txt.tmp
-    mv ps5_autoloader/autoload.txt.tmp ps5_autoloader/autoload.txt
+    generate_autoload_txt "$PLDMGR_NAME"
     
     echo "Source build complete."
 }
@@ -81,6 +111,10 @@ else
     
     if [ -n "$HAS_KEXP" ] && [ -n "$HAS_ELFLDR" ] && [ -n "$HAS_PLDMGR" ]; then
         echo "Dependencies already present."
+        if [ ! -f "ps5_autoloader/autoload.txt" ]; then
+            PLDMGR_NAME=$(basename "$HAS_PLDMGR")
+            generate_autoload_txt "$PLDMGR_NAME"
+        fi
     else
         # If submodules checked out, build from source
         if [ -e "third_party/ps5-elfldr/.git" ] && [ -e "third_party/ps5-kexp/.git" ] && [ -e "third_party/ps5-payload-manager/.git" ]; then
