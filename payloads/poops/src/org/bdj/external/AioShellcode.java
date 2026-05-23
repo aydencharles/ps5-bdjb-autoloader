@@ -21,8 +21,8 @@ public class AioShellcode {
 
     private static final int MAP_SHARED = 0x0001;
 
-    private static final String BIN_PATH = "/org/bdj/external/kexp_v6.bin";
-    private static final String ELFLDR_PATH = "/org/bdj/external/elfldr.elf";
+    private static final String BIN_PATH = BinaryPaths.BIN_PATH;
+    private static final String ELFLDR_PATH = BinaryPaths.ELFLDR_PATH;
 
     private static final API       api;
     private static final KernelAPI kapi;

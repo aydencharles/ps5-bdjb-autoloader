@@ -24,6 +24,10 @@ jobs:
         run: |
           VERSION=$(make print-version BUILD_TYPE=stable)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          ELFLDR_VER=$(basename payloads/poops/src/org/bdj/external/elfldr-ps5-*.elf .elf | sed 's/elfldr-ps5-//')
+          KEXP_VER=$(basename payloads/poops/src/org/bdj/external/kexp-*.bin .bin | sed 's/kexp-//')
+          echo "elfldr_ver=${ELFLDR_VER}" >> $GITHUB_OUTPUT
+          echo "kexp_ver=${KEXP_VER}" >> $GITHUB_OUTPUT
 
       - name: Create Stable Release
         uses: softprops/action-gh-release@v2
@@ -33,4 +37,9 @@ jobs:
           prerelease: false
           body: |
             Stable Release ${{ steps.get_version.outputs.version }}
+
+            **Bundled Binaries:**
+            This build integrates the following external dependency versions:
+            - [itsPLK/ps5-elfldr](https://github.com/itsPLK/ps5-elfldr): [${{ steps.get_version.outputs.elfldr_ver }}](https://github.com/itsPLK/ps5-elfldr/releases/tag/${{ steps.get_version.outputs.elfldr_ver }})
+            - [itsPLK/ps5-kexp](https://github.com/itsPLK/ps5-kexp): [${{ steps.get_version.outputs.kexp_ver }}](https://github.com/itsPLK/ps5-kexp/releases/tag/${{ steps.get_version.outputs.kexp_ver }})
           files: '*.iso'

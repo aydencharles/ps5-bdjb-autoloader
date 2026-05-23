@@ -108,6 +108,8 @@ $(ISO_FILE): $(DISC_FILES) autoloader poops
 	$(MAKEFS) -m 16m -t udf -o T=bdre,v=2.50,L=$(DISC_LABEL) $@ discdir
 
 clean:
+	$(MAKE) -C payloads/autoloader clean
+	$(MAKE) -C payloads/poops clean
 	rm -rf META-INF *.iso discdir src/jdk/internal/misc/*.class src/org/bdj/*.class src/org/bdj/sandbox/*.class src/org/bdj/api/*.class src/org/bdj/Version.java
 
 .PHONY: print-version

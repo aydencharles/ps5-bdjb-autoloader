@@ -7,3 +7,6 @@ META-INF/
 **/*.jar
 payloads/**/*.jar
 src/org/bdj/Version.java
+payloads/poops/src/org/bdj/external/kexp-*.bin
+payloads/poops/src/org/bdj/external/elfldr-*.elf
+payloads/poops/src/org/bdj/external/BinaryPaths.java
