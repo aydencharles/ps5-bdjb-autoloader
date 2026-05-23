@@ -26,8 +26,10 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           ELFLDR_VER=$(basename payloads/poops/src/org/bdj/external/elfldr-ps5-*.elf .elf | sed 's/elfldr-ps5-//')
           KEXP_VER=$(basename payloads/poops/src/org/bdj/external/kexp-*.bin .bin | sed 's/kexp-//')
+          PLDMGR_VER=$(basename $(ls ps5_autoloader/pldmgr-*.elf ps5_autoloader/pldmgr_v*.elf 2>/dev/null | head -n 1) .elf | sed -E 's/pldmgr[-_v]+//')
           echo "elfldr_ver=${ELFLDR_VER}" >> $GITHUB_OUTPUT
           echo "kexp_ver=${KEXP_VER}" >> $GITHUB_OUTPUT
+          echo "pldmgr_ver=${PLDMGR_VER}" >> $GITHUB_OUTPUT
 
       - name: Create Dev Release
         uses: softprops/action-gh-release@v2
@@ -42,5 +44,6 @@ jobs:
             This build integrates the following external dependency versions:
             - [itsPLK/ps5-elfldr](https://github.com/itsPLK/ps5-elfldr): [${{ steps.get_version.outputs.elfldr_ver }}](https://github.com/itsPLK/ps5-elfldr/releases/tag/${{ steps.get_version.outputs.elfldr_ver }})
             - [itsPLK/ps5-kexp](https://github.com/itsPLK/ps5-kexp): [${{ steps.get_version.outputs.kexp_ver }}](https://github.com/itsPLK/ps5-kexp/releases/tag/${{ steps.get_version.outputs.kexp_ver }})
+            - [itsPLK/ps5-payload-manager](https://github.com/itsPLK/ps5-payload-manager): [v${{ steps.get_version.outputs.pldmgr_ver }}](https://github.com/itsPLK/ps5-payload-manager/releases/tag/v${{ steps.get_version.outputs.pldmgr_ver }})
           files: '*.iso'
 
