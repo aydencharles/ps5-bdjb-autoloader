@@ -7,7 +7,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 DEST_DIR="payloads/poops/src/org/bdj/external"
+AUTOLOADER_DEST_DIR="payloads/autoloader"
 mkdir -p "$DEST_DIR"
+mkdir -p "$AUTOLOADER_DEST_DIR"
 
 echo "Checking for curl..."
 if ! command -v curl &> /dev/null; then
@@ -48,12 +50,12 @@ if [ "${GITHUB_OUTPUT:-}" ]; then
 fi
 
 # Clean old dependency files
-echo "Cleaning old binaries from $DEST_DIR..."
+echo "Cleaning old binaries..."
 rm -f "$DEST_DIR"/kexp-*.bin
 rm -f "$DEST_DIR"/elfldr-*.elf
 rm -f "$DEST_DIR"/kexp_v6.bin
 rm -f "$DEST_DIR"/elfldr.elf
-rm -f "$DEST_DIR"/ps5-unified-autoloader*.elf
+rm -f "$AUTOLOADER_DEST_DIR"/ps5-unified-autoloader*.elf
 
 ELFLDR_FILE="elfldr-ps5-${ELFLDR_VER}.elf"
 KEXP_FILE="kexp-${KEXP_VER}.bin"
@@ -66,8 +68,8 @@ curl -L -o "$DEST_DIR/$ELFLDR_FILE" "$ELFLDR_URL"
 echo "Downloading $KEXP_URL to $DEST_DIR/$KEXP_FILE..."
 curl -L -o "$DEST_DIR/$KEXP_FILE" "$KEXP_URL"
 
-echo "Downloading $AUTOLOADER_URL to $DEST_DIR/$AUTOLOADER_FILE..."
-curl -L -o "$DEST_DIR/$AUTOLOADER_FILE" "$AUTOLOADER_URL"
+echo "Downloading $AUTOLOADER_URL to $AUTOLOADER_DEST_DIR/$AUTOLOADER_FILE..."
+curl -L -o "$AUTOLOADER_DEST_DIR/$AUTOLOADER_FILE" "$AUTOLOADER_URL"
 
 echo "Successfully downloaded all dependencies!"
 echo "Dependency versions:"
@@ -75,3 +77,4 @@ echo "  - elfldr: $ELFLDR_VER"
 echo "  - kexp: $KEXP_VER"
 echo "  - unified-autoloader: $AUTOLOADER_VER"
 ls -la "$DEST_DIR"
+ls -la "$AUTOLOADER_DEST_DIR"

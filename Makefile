@@ -104,7 +104,7 @@ $(ISO_FILE): $(DISC_FILES) autoloader poops
 	cp -r BDMV/META discdir/BDMV/
 	sed -i "s/@@VERSION@@/$(XML_VERSION)/g" discdir/BDMV/META/DL/bdmt_eng.xml
 	cp -r BDMV/BDJO discdir/BDMV/
-	cp payloads/poops/src/org/bdj/external/ps5-unified-autoloader.elf discdir/
+	cp payloads/autoloader/ps5-unified-autoloader.elf discdir/
 	$(MAKEFS) -m 16m -t udf -o T=bdre,v=2.50,L=$(DISC_LABEL) $@ discdir
 
 clean:

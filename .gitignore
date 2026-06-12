@@ -10,4 +10,4 @@ src/org/bdj/Version.java
 payloads/poops/src/org/bdj/external/kexp-*.bin
 payloads/poops/src/org/bdj/external/elfldr-*.elf
 payloads/poops/src/org/bdj/external/BinaryPaths.java
-payloads/poops/src/org/bdj/external/ps5-unified-autoloader.elf
+payloads/autoloader/ps5-unified-autoloader*.elf

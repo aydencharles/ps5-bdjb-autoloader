@@ -19,6 +19,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 DEST_DIR="payloads/poops/src/org/bdj/external"
+AUTOLOADER_DEST_DIR="payloads/autoloader"
 
 # Helper to build dependencies from source
 build_source_deps() {
@@ -34,7 +35,7 @@ build_source_deps() {
     rm -f "$DEST_DIR"/elfldr-*.elf
     rm -f "$DEST_DIR"/kexp_v6.bin
     rm -f "$DEST_DIR"/elfldr.elf
-    rm -f "$DEST_DIR"/ps5-unified-autoloader*.elf
+    rm -f "$AUTOLOADER_DEST_DIR"/ps5-unified-autoloader*.elf
     
     echo "Building ps5-elfldr..."
     (cd third_party/ps5-elfldr && ./build.sh)
@@ -54,7 +55,7 @@ build_source_deps() {
         echo "Error: ps5-unified-autoloader build succeeded but no output ELF found." >&2
         exit 1
     fi
-    cp "$AUTOLOADER_ELF" "$DEST_DIR/ps5-unified-autoloader.elf"
+    cp "$AUTOLOADER_ELF" "$AUTOLOADER_DEST_DIR/ps5-unified-autoloader.elf"
 
     if [ "${GITHUB_OUTPUT:-}" ]; then
         echo "elfldr_ver=${ELFLDR_VER}" >> "$GITHUB_OUTPUT"
@@ -80,7 +81,7 @@ else
     # Auto mode: check if binaries exist
     HAS_KEXP=$(ls "$DEST_DIR"/kexp-*.bin 2>/dev/null | head -n 1)
     HAS_ELFLDR=$(ls "$DEST_DIR"/elfldr-*.elf 2>/dev/null | head -n 1)
-    HAS_AUTOLOADER=$(ls "$DEST_DIR"/ps5-unified-autoloader.elf 2>/dev/null | head -n 1)
+    HAS_AUTOLOADER=$(ls "$AUTOLOADER_DEST_DIR"/ps5-unified-autoloader.elf 2>/dev/null | head -n 1)
     
     if [ -n "$HAS_KEXP" ] && [ -n "$HAS_ELFLDR" ] && [ -n "$HAS_AUTOLOADER" ]; then
         echo "Dependencies already present."
