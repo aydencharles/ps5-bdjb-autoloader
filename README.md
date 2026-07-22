@@ -23,7 +23,7 @@ There are two ways to use the autoloader:
 
 ### 🟢 Option 1: Payload Manager
 
-If no `autoload.txt` config is found, the autoloader will automatically launch **[Payload Manager](https://github.com/itsPLK/ps5-payload-manager)** — a fully-featured PS5 payload manager with a web UI. This lets you configure and send payloads directly from your browser, without needing to manually set up config files or transfer ELF files ahead of time.
+If no `autoload.txt` config is found, the autoloader will automatically launch **[Payload Manager](https://github.com/itsPLK/ps5-payload-manager)** (v0.5.0, multi-language including **Simplified Chinese**) — a fully-featured PS5 payload manager with a web UI. This lets you configure and send payloads directly from your browser, without needing to manually set up config files or transfer ELF files ahead of time.
 
 Just run the autoloader — if there's nothing configured, Payload Manager starts automatically.
 
@@ -50,35 +50,13 @@ For a fixed, automated payload chain, you can configure payloads manually:
 
 This autoloader is deployed via a BD-R disc.
 
-1. Download the **PS5 BD-JB Autoloader ISO** from the [Releases](https://github.com/itsPLK/ps5-bdjb-autoloader/releases) page.
+1. Download the **PS5 BD-JB Autoloader ISO** from the [Releases](https://github.com/aydencharles/ps5-bdjb-autoloader/releases) page.
 2. Burn the ISO to a BD-R(E) disc using software like `ImgBurn` (use UDF 2.50 filesystem).
 3. Insert the disc into the PS5 and launch it from the "Media" tab.
 
 *Note: Since this is a disc-based loader, updates to the loader itself require burning a new ISO. However, your payloads on USB or internal storage can be updated at any time.*
 
-
-## Additional Info
-
-<Details>
-<Summary><i>How to use a custom ELF Loader version?</i></Summary>
-
-By default, the autoloader embeds the original [ps5-payload-dev/elfldr](https://github.com/ps5-payload-dev/elfldr), which listens on port **9021** and accepts payloads from any device on the network.
-
-If you want to use a different ELF Loader (for example a localhost-only build):
-1. Place your custom ELF Loader (e.g. `elfldr.elf`) in the `ps5_autoloader` directory.
-2. Add `elfldr.elf` to your `autoload.txt`.
-3. **Note**: If you are loading other payloads right after `elfldr.elf` in your `autoload.txt`, add a sleep command immediately after it (like `!4000` to sleep for 4 seconds) to give the new ELF Loader time to start up and listen before subsequent payloads are sent.
-
-Example `autoload.txt`:
-```text
-# Load custom ELF Loader
-elfldr.elf
-# Give it 4 seconds to start up (only needed if sending more payloads)
-!4000
-# Send other payloads
-ftpsrv.elf
-```
-</Details>
+After jailbreak, the bundled [ps5-payload-dev/elfldr](https://github.com/ps5-payload-dev/elfldr) listens on port **9021** and accepts ELF payloads from any device on your network (as well as local paths / HTTP URIs supported by elfldr).
 
 ## Credits
 
