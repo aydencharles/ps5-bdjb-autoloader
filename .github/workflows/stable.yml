@@ -32,7 +32,7 @@ jobs:
           echo "last_stable_tag=${LAST_STABLE_TAG}" >> $GITHUB_OUTPUT
           ELFLDR_VER=$(basename payloads/poops/src/org/bdj/external/elfldr-ps5-*.elf .elf | sed 's/elfldr-ps5-//')
           KEXP_VER=$(basename payloads/poops/src/org/bdj/external/kexp-*.bin .bin | sed 's/kexp-//')
-          AUTOLOADER_VER=$(curl -s https://api.github.com/repos/itsPLK/ps5-unified-autoloader/releases/latest | grep -o '"tag_name": "[^"]*"' | head -n 1 | cut -d'"' -f4)
+          AUTOLOADER_VER=$(curl -s https://api.github.com/repos/aydencharles/ps5-unified-autoloader/releases/latest | grep -o '"tag_name": "[^"]*"' | head -n 1 | cut -d'"' -f4)
           echo "elfldr_ver=${ELFLDR_VER}" >> $GITHUB_OUTPUT
           echo "kexp_ver=${KEXP_VER}" >> $GITHUB_OUTPUT
           echo "unified_autoloader_ver=${AUTOLOADER_VER}" >> $GITHUB_OUTPUT
@@ -56,7 +56,7 @@ jobs:
             This build integrates the following external dependency versions:
             - [ps5-payload-dev/elfldr](https://github.com/ps5-payload-dev/elfldr): [${{ steps.get_version.outputs.elfldr_ver }}](https://github.com/ps5-payload-dev/elfldr/releases/tag/${{ steps.get_version.outputs.elfldr_ver }})
             - [itsPLK/ps5-kexp](https://github.com/itsPLK/ps5-kexp): [${{ steps.get_version.outputs.kexp_ver }}](https://github.com/itsPLK/ps5-kexp/releases/tag/${{ steps.get_version.outputs.kexp_ver }})
-            - [itsPLK/ps5-unified-autoloader](https://github.com/itsPLK/ps5-unified-autoloader): [${{ steps.get_version.outputs.unified_autoloader_ver }}](https://github.com/itsPLK/ps5-unified-autoloader/releases/tag/${{ steps.get_version.outputs.unified_autoloader_ver }})
+            - [aydencharles/ps5-unified-autoloader](https://github.com/aydencharles/ps5-unified-autoloader): [${{ steps.get_version.outputs.unified_autoloader_ver }}](https://github.com/aydencharles/ps5-unified-autoloader/releases/tag/${{ steps.get_version.outputs.unified_autoloader_ver }})
 
             </details>
           files: '*.iso'

@@ -36,11 +36,12 @@ if [ -z "$KEXP_URL" ]; then
     exit 1
 fi
 
-echo "Fetching latest release URL for ps5-unified-autoloader..."
-AUTOLOADER_RELEASE_JSON=$(curl -s https://api.github.com/repos/itsPLK/ps5-unified-autoloader/releases/latest)
-AUTOLOADER_URL=$(echo "$AUTOLOADER_RELEASE_JSON" | grep -o 'https://github.com/itsPLK/ps5-unified-autoloader/releases/download/[^"]*\.elf' | head -n 1)
+echo "Fetching latest release URL for aydencharles/ps5-unified-autoloader..."
+AUTOLOADER_RELEASE_JSON=$(curl -s https://api.github.com/repos/aydencharles/ps5-unified-autoloader/releases/latest)
+AUTOLOADER_URL=$(echo "$AUTOLOADER_RELEASE_JSON" | grep -o 'https://github.com/aydencharles/ps5-unified-autoloader/releases/download/[^"]*\.elf' | head -n 1)
 if [ -z "$AUTOLOADER_URL" ]; then
-    echo "Error: Could not retrieve latest release URL for ps5-unified-autoloader." >&2
+    echo "Error: Could not retrieve latest release URL for aydencharles/ps5-unified-autoloader." >&2
+    echo "Hint: publish a release asset, or build with: ./build_iso.sh --build-deps" >&2
     exit 1
 fi
 
