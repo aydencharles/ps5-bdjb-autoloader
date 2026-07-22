@@ -1,6 +1,7 @@
 [submodule "third_party/ps5-elfldr"]
 	path = third_party/ps5-elfldr
-	url = https://github.com/itsPLK/ps5-elfldr.git
+	url = https://github.com/ps5-payload-dev/elfldr.git
+	branch = master
 [submodule "third_party/ps5-kexp"]
 	path = third_party/ps5-kexp
 	url = https://github.com/itsPLK/ps5-kexp.git

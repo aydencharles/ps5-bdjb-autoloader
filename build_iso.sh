@@ -21,6 +21,50 @@ done
 DEST_DIR="payloads/poops/src/org/bdj/external"
 AUTOLOADER_DEST_DIR="payloads/autoloader"
 
+# Prefer `docker compose` plugin, fall back to standalone docker-compose
+docker_compose() {
+    if docker compose version >/dev/null 2>&1; then
+        docker compose "$@"
+    elif command -v docker-compose >/dev/null 2>&1; then
+        docker-compose "$@"
+    else
+        echo "Error: neither 'docker compose' nor 'docker-compose' is available." >&2
+        exit 1
+    fi
+}
+
+# Build original ps5-payload-dev/elfldr via Docker + official SDK
+build_elfldr() {
+    local ELFLDR_DIR="third_party/ps5-elfldr"
+    local SDK_IMAGE="ps5-payload-sdk-elfldr"
+    local SDK_DOCKERFILE="scripts/Dockerfile.elfldr-sdk"
+
+    if [ -x "$ELFLDR_DIR/build.sh" ]; then
+        # Forks may ship a helper script
+        (cd "$ELFLDR_DIR" && ./build.sh)
+        return
+    fi
+
+    if [ -n "${PS5_PAYLOAD_SDK:-}" ] && [ -f "${PS5_PAYLOAD_SDK}/toolchain/prospero.mk" ]; then
+        echo "Building elfldr with host PS5_PAYLOAD_SDK=${PS5_PAYLOAD_SDK}..."
+        (cd "$ELFLDR_DIR" && make clean all)
+        return
+    fi
+
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "Error: building original elfldr requires Docker or PS5_PAYLOAD_SDK." >&2
+        exit 1
+    fi
+
+    if [[ "$(docker images -q "$SDK_IMAGE" 2>/dev/null)" == "" ]]; then
+        echo "Building Docker SDK image $SDK_IMAGE (first time may take a while)..."
+        docker build -t "$SDK_IMAGE" -f "$SDK_DOCKERFILE" scripts/
+    fi
+
+    echo "Building elfldr-ps5.elf via Docker ($SDK_IMAGE)..."
+    docker run --rm -v "$(cd "$ELFLDR_DIR" && pwd)":/src -w /src "$SDK_IMAGE" make clean all
+}
+
 # Helper to build dependencies from source
 build_source_deps() {
     echo "=== Building dependencies from source ==="
@@ -37,9 +81,13 @@ build_source_deps() {
     rm -f "$DEST_DIR"/elfldr.elf
     rm -f "$AUTOLOADER_DEST_DIR"/ps5-unified-autoloader*.elf
     
-    echo "Building ps5-elfldr..."
-    (cd third_party/ps5-elfldr && ./build.sh)
+    echo "Building ps5-payload-dev/elfldr..."
+    build_elfldr
     ELFLDR_VER=$(git -C third_party/ps5-elfldr describe --tags --always)
+    if [ ! -f third_party/ps5-elfldr/elfldr-ps5.elf ]; then
+        echo "Error: elfldr build succeeded but elfldr-ps5.elf not found." >&2
+        exit 1
+    fi
     cp third_party/ps5-elfldr/elfldr-ps5.elf "$DEST_DIR/elfldr-ps5-${ELFLDR_VER}.elf"
     
     echo "Building ps5-kexp..."
@@ -86,19 +134,15 @@ else
     if [ -n "$HAS_KEXP" ] && [ -n "$HAS_ELFLDR" ] && [ -n "$HAS_AUTOLOADER" ]; then
         echo "Dependencies already present."
     else
-        # If submodules checked out, build from source
-        if [ -e "third_party/ps5-elfldr/.git" ] && [ -e "third_party/ps5-kexp/.git" ] && [ -e "third_party/ps5-unified-autoloader/.git" ]; then
-            build_source_deps
-        else
-            download_prebuilt_deps
-        fi
+        # Prefer prebuilt downloads; source build needs Docker SDK image
+        download_prebuilt_deps
     fi
 fi
 
 echo "Starting PS5 BD-JB Autoloader Docker Builder ($BUILD_TYPE)..."
 
 # Build the docker image if needed
-docker compose build builder
+docker_compose build builder
 
 # Run the build process
-docker compose run --rm --remove-orphans -e BUILD_TYPE=$BUILD_TYPE builder
+docker_compose run --rm --remove-orphans -e BUILD_TYPE=$BUILD_TYPE builder

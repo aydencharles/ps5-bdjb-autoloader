@@ -60,11 +60,11 @@ This autoloader is deployed via a BD-R disc.
 ## Additional Info
 
 <Details>
-<Summary><i>How to use custom ELF Loader version?</i></Summary>
+<Summary><i>How to use a custom ELF Loader version?</i></Summary>
 
-By default, the autoloader uses a custom version of **elfldr** that only accepts connections from the PS5 itself (localhost). This improves security by preventing other devices on your network from sending payloads to your console.
+By default, the autoloader embeds the original [ps5-payload-dev/elfldr](https://github.com/ps5-payload-dev/elfldr), which listens on port **9021** and accepts payloads from any device on the network.
 
-If you want to use a "normal" ELF Loader that allows sending payloads from any device:
+If you want to use a different ELF Loader (for example a localhost-only build):
 1. Place your custom ELF Loader (e.g. `elfldr.elf`) in the `ps5_autoloader` directory.
 2. Add `elfldr.elf` to your `autoload.txt`.
 3. **Note**: If you are loading other payloads right after `elfldr.elf` in your `autoload.txt`, add a sleep command immediately after it (like `!4000` to sleep for 4 seconds) to give the new ELF Loader time to start up and listen before subsequent payloads are sent.
@@ -85,7 +85,7 @@ ftpsrv.elf
 * **[Gezine](https://github.com/Gezine)** - [BD-UN-JB](https://github.com/Gezine/BD-UN-JB), [Poops exploit implementation](https://github.com/Gezine/BD-UN-JB/blob/main/payloads/poops/src/org/bdj/external/Poops.java)
 * **[TheFlow](https://github.com/theofficialflow)** — BD-JB documentation & native code execution sources.  
 * **[hammer-83](https://github.com/hammer-83)** — PS5 Remote JAR Loader reference.  
-* **[john-tornblom](https://github.com/john-tornblom)** — [BDJ-SDK](https://github.com/john-tornblom/bdj-sdk) and [ps5-payload-sdk](https://github.com/ps5-payload-dev/sdk/) used for compilation.  
+* **[john-tornblom](https://github.com/john-tornblom)** — [BDJ-SDK](https://github.com/john-tornblom/bdj-sdk), [ps5-payload-sdk](https://github.com/ps5-payload-dev/sdk/), and [elfldr](https://github.com/ps5-payload-dev/elfldr) used for compilation / payload loading.  
 * **[ufm42](https://github.com/ufm42)** - [kexp](https://github.com/ufm42/kexp) used for PS5 post JB all-in-one shellcode
 * **[kuba--](https://github.com/kuba--)** — [zip](https://github.com/kuba--/zip) used for bdj_unpatch elf payload.  
 

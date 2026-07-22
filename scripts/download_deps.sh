@@ -17,10 +17,15 @@ if ! command -v curl &> /dev/null; then
     exit 1
 fi
 
-echo "Fetching latest release URL for ps5-elfldr..."
-ELFLDR_URL=$(curl -s https://api.github.com/repos/itsPLK/ps5-elfldr/releases/latest | grep -o 'https://github.com/itsPLK/ps5-elfldr/releases/download/[^"]*\.elf' | head -n 1)
+echo "Fetching latest release URL for ps5-payload-dev/elfldr..."
+ELFLDR_RELEASE_JSON=$(curl -s https://api.github.com/repos/ps5-payload-dev/elfldr/releases/latest)
+ELFLDR_URL=$(echo "$ELFLDR_RELEASE_JSON" | grep -o 'https://github.com/ps5-payload-dev/elfldr/releases/download/[^"]*elfldr-ps5\.elf' | head -n 1)
 if [ -z "$ELFLDR_URL" ]; then
-    echo "Error: Could not retrieve latest release URL for ps5-elfldr." >&2
+    # Fallback: asset may be named differently
+    ELFLDR_URL=$(echo "$ELFLDR_RELEASE_JSON" | grep -o 'https://github.com/ps5-payload-dev/elfldr/releases/download/[^"]*\.elf' | head -n 1)
+fi
+if [ -z "$ELFLDR_URL" ]; then
+    echo "Error: Could not retrieve latest release URL for ps5-payload-dev/elfldr." >&2
     exit 1
 fi
 
@@ -73,7 +78,7 @@ curl -L -o "$AUTOLOADER_DEST_DIR/$AUTOLOADER_FILE" "$AUTOLOADER_URL"
 
 echo "Successfully downloaded all dependencies!"
 echo "Dependency versions:"
-echo "  - elfldr: $ELFLDR_VER"
+echo "  - elfldr: $ELFLDR_VER (ps5-payload-dev/elfldr)"
 echo "  - kexp: $KEXP_VER"
 echo "  - unified-autoloader: $AUTOLOADER_VER"
 ls -la "$DEST_DIR"

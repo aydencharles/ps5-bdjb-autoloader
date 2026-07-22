@@ -1,0 +1,33 @@
+# Docker image for building ps5-payload-dev/elfldr with the official SDK
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    cmake \
+    ninja-build \
+    clang-18 \
+    lld-18 \
+    make \
+    python3 \
+    python3-pyelftools \
+    wget \
+    xz-utils \
+    pkg-config \
+    sudo \
+    unzip \
+    xxd \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/clang-18 /usr/bin/clang && \
+    ln -sf /usr/bin/clang++-18 /usr/bin/clang++ && \
+    ln -sf /usr/bin/ld.lld-18 /usr/bin/ld.lld
+
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/ps5-payload-dev/sdk.git ps5-payload-sdk-source
+
+WORKDIR /opt/ps5-payload-sdk-source
+RUN make DESTDIR=/opt/ps5-payload-sdk install
+
+ENV PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk
+WORKDIR /src
